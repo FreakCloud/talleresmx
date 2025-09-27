@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 export default function RegistroPage() {
   const [form, setForm] = useState({ nombre: "", email: "", password: "" });
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -13,18 +14,35 @@ export default function RegistroPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch("/api/auth/registro", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/registro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
 
-    if (res.ok) {
-      alert("Usuario creado correctamente. Inicia sesión.");
-      router.push("/login"); //redirige al login
-    } else {
-      alert(data.message);
+      if (form.password.length < 6) {
+      alert("La contraseña debe tener al menos 6 caracteres");
+      return;
+      }
+
+      const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*()_+[\]{};:,.<>?]).{6,}$/;
+
+      if (!passwordRegex.test(form.password)) {
+        alert("La contraseña debe incluir al menos un número y un caracter especial");
+        return;
+      }
+
+      if (res.ok) {
+        alert("Usuario creado correctamente. Inicia sesión.");
+        router.push("/login"); //redirige al login
+      } else {
+        alert(data.message);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,9 +79,10 @@ export default function RegistroPage() {
         />
         <button
           type="submit"
+          disabled={loading}
           className="w-full bg-pink-600 text-white p-2 rounded hover:bg-pink-700"
         >
-          Crear cuenta
+          {loading ? "Creando..." : "Crear cuenta"}
         </button>
       </form>
     </div>

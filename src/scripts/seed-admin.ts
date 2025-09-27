@@ -26,7 +26,7 @@ async function seedAdmin() {
       role: "admin",
     });
 
-    console.log("Admin creado con éxito: admin@talleres.com / 123456");
+    console.log("Usuario admin creado exitosamente");
   } catch (err) {
     console.error("Error al crear admin:", err);
   } finally {
