@@ -44,6 +44,12 @@ export default function DashboardPage() {
 
   if (loading) return <p className="p-8">Cargando...</p>;
 
+
+    const handleLogout = () => {
+      logout();
+      router.push("/login");
+    };
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       {/* Header */}
@@ -52,7 +58,9 @@ export default function DashboardPage() {
           Dashboard de Usuario
         </h1>
         <button
-          onClick={logout}
+          type="button"
+          aria-label="Cerrar sesión"
+          onClick={handleLogout}
           className="bg-red-600 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 transition"
         >
           Cerrar sesión

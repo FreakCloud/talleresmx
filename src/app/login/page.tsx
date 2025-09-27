@@ -7,6 +7,8 @@ export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -15,6 +17,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     try {
       const res = await fetch("/api/auth/login", {
@@ -37,11 +40,17 @@ export default function LoginPage() {
           router.push("/dashboard");
         }
       } else {
-        alert(data.message);
+        if (res.status === 404) {
+          setError("El usuario no existe.");
+        } else if (res.status === 401) {
+          setError("Contraseña incorrecta.");
+        } else {
+          setError(data.message || "Error al iniciar sesión.");
+        }
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
-      alert("Ocurrió un error. Intenta nuevamente.");
+      setError("Ocurrió un error inesperado. Intenta nuevamente.");
     } finally {
       setLoading(false);
     }
@@ -54,6 +63,13 @@ export default function LoginPage() {
         className="bg-white p-8 rounded-2xl shadow-md w-96"
       >
         <h2 className="text-2xl font-bold text-pink-600 mb-4">Login</h2>
+
+       {error && (
+          <p className="text-red-600 text-sm mb-3 bg-red-100 p-2 rounded">
+            {error}
+          </p>
+        )}
+
         <input
           type="email"
           name="email"
